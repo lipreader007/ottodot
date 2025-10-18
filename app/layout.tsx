@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <header className="border-b bg-white">
           <div className="mx-auto flex max-w-5xl items-center gap-3 p-3">
-            <img src="/Logo%20Horizontal.png" alt="OTTODOT HR" className="h-10 w-auto" />
+            <img src="/Logo%20Horizontal.png" alt="OTTODOT HR" className="h-8 w-auto md:h-10 object-contain"/>
             <span className="chip">Demo</span>
           </div>
         </header>
