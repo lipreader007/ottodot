@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #4f46e5;
+  --brand-accent: #10b981;
+  --brand-bg: #f8fafc;
+  --brand-ink: #0f172a;
+}
+body { background: var(--brand-bg); color: var(--brand-ink); }
+.btn-primary { @apply rounded-xl px-4 py-2 text-white shadow disabled:opacity-50; background: var(--brand-primary); }
+.btn-accent  { @apply rounded-xl px-4 py-2 text-white shadow disabled:opacity-50; background: var(--brand-accent); }
+.card { @apply rounded-2xl bg-white shadow; }
+.chip { @apply inline-block rounded-full px-2 py-0.5 text-xs; background: #EEF2FF; color: #3730A3; }

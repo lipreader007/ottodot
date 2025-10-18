@@ -1,0 +1,13 @@
+cat > .gitignore << 'EOF'
+node_modules/
+.next/
+out/
+.vercel/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.vscode/
+.idea/
+EOF
