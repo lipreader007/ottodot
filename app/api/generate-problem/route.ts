@@ -22,13 +22,14 @@ and has a single numeric final answer. Return ONLY JSON with keys:
 No prose, no code fences.`
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }); // ← change here
+    const result = await model.generateContent(prompt);
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 256 }, // 👈 no responseSchema
-    })
+    // const result = await model.generateContent({
+    //   contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    //   generationConfig: { temperature: 0.2, maxOutputTokens: 256 }, // 👈 no responseSchema
+    // })
 
     let text = result.response.text() || ''
     text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/, '').trim()

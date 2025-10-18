@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const feedbackPrompt = `You are a friendly P5 math tutor. The problem was: "${session.problem_text}"
     The correct final answer is ${session.final_answer}. The student answered ${user_answer}.
     1) Start with brief encouragement.
