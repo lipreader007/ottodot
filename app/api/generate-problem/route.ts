@@ -1,8 +1,11 @@
-// app/api/generate-problem/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { z } from 'zod'
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
+import {
+  GoogleGenerativeAI,
+  SchemaType,
+  type Schema,        // 👈 bring in Schema type
+} from '@google/generative-ai'
 
 export const runtime = 'nodejs'
 
@@ -19,11 +22,21 @@ export async function POST(_req: NextRequest) {
 and has a single numeric final answer. Return ONLY JSON with keys:
 - problem_text (string)
 - final_answer (number)
-Do NOT include any prose or code fences.`
+No prose, no code fences.`
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+    // 👇 define the schema using SchemaType (not string literals)
+    const responseSchema: Schema = {
+      type: SchemaType.OBJECT,
+      properties: {
+        problem_text: { type: SchemaType.STRING },
+        final_answer: { type: SchemaType.NUMBER },
+      },
+      required: ['problem_text', 'final_answer'],
+    }
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -31,21 +44,14 @@ Do NOT include any prose or code fences.`
         temperature: 0.2,
         maxOutputTokens: 256,
         responseMimeType: 'application/json',
-        responseSchema: {
-          type: SchemaType.OBJECT,
-          properties: {
-            problem_text: { type: SchemaType.STRING },
-            final_answer: { type: SchemaType.NUMBER },
-          },
-          required: ['problem_text', 'final_answer'],
-        },
+        responseSchema,             // 👈 typed Schema
       },
     })
 
     let text = result.response.text() || ''
     text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/, '').trim()
-    const parsedJson = JSON.parse(text)
 
+    const parsedJson = JSON.parse(text)
     const parsed = OUT_SCHEMA.safeParse(parsedJson)
     if (!parsed.success) {
       return NextResponse.json(
