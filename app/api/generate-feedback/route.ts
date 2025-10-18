@@ -16,18 +16,18 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json()
   const parsed = IN_SCHEMA.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: 'Bad request', issues: parsed.error.issues }, { status: 400 })
-
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Bad request', issues: parsed.error.issues }, { status: 400 })
+  }
   const { session_id, user_answer } = parsed.data
 
   const supa = supabaseServer()
-  const { data: session, error } = await supa
+  const { data: session, error: sErr } = await supa
     .from('math_problem_sessions')
     .select('*')
     .eq('id', session_id)
     .single()
-
-  if (error || !session) return NextResponse.json({ error: error?.message || 'Session not found' }, { status: 404 })
+  if (sErr || !session) return NextResponse.json({ error: sErr?.message || 'Session not found' }, { status: 404 })
 
   const is_correct = Number(user_answer) === Number(session.final_answer)
 
@@ -38,18 +38,21 @@ export async function POST(req: NextRequest) {
     .single()
   if (subErr) return NextResponse.json({ error: subErr.message }, { status: 500 })
 
-  // --- Gemini SDK ---
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-  const feedbackPrompt = `You are a friendly P5 math tutor. The problem was: "${session.problem_text}"
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const feedbackPrompt = `You are a friendly P5 math tutor. The problem was: "${session.problem_text}"
 The correct final answer is ${session.final_answer}. The student answered ${user_answer}.
 1) Start with brief encouragement.
 2) If incorrect, explain the main misconception succinctly, then show a 2–3 step outline to solve it correctly.
 3) End with a quick tip related to this problem type.
 Limit to 120 words.`
 
-  const result = await model.generateContent(feedbackPrompt)
-  const feedback = result.response.text() || 'Great effort! Keep practicing.'
-
-  return NextResponse.json({ submission, feedback, is_correct })
+    const res = await model.generateContent(feedbackPrompt)
+    const feedback = res.response.text() || 'Great effort! Keep practicing.'
+    return NextResponse.json({ submission, feedback, is_correct })
+  } catch (e: any) {
+    console.error('Gemini feedback error:', e?.message || e)
+    return NextResponse.json({ submission, is_correct, feedback: 'Unable to fetch feedback right now.' })
+  }
 }
