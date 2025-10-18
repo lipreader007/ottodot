@@ -4,7 +4,7 @@ import { z } from 'zod'
 import {
   GoogleGenerativeAI,
   SchemaType,
-  type Schema,        // 👈 bring in Schema type
+  type Schema,
 } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
@@ -25,7 +25,7 @@ and has a single numeric final answer. Return ONLY JSON with keys:
 No prose, no code fences.`
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey)
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
     // 👇 define the schema using SchemaType (not string literals)
@@ -43,8 +43,8 @@ No prose, no code fences.`
       generationConfig: {
         temperature: 0.2,
         maxOutputTokens: 256,
-        responseMimeType: 'application/json',
-        responseSchema,             // 👈 typed Schema
+        // responseMimeType: 'application/json',
+        // responseSchema,
       },
     })
 
