@@ -1,4 +1,4 @@
-# Ottodot – AI Math Problem Generator (P5) — Human Nexus Branded
+# Ottodot – AI Math Problem Generator (P5)
 
 Tailored UI (logo top-left, brand palette) and **keys injected** for submission.
 
